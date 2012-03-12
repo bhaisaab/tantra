@@ -1,0 +1,78 @@
+OBJDIRS += kernel
+
+KERNEL_LDFLAGS := $(LDFLAGS) -T kernel/kernel.ld -nostdlib
+
+KERNEL_SRCFILES :=	kernel/entry.S \
+										kernel/kernel.c \
+                    lib/ctype.c \
+                    lib/stdio.c \
+                    lib/stdlib.c \
+                    lib/string.c
+
+# Only build files if they exist.
+KERNEL_SRCFILES := $(wildcard $(KERNEL_SRCFILES))
+
+KERNEL_BINFILES := 
+
+KERNEL_OBJFILES := $(patsubst %.c, $(OBJDIR)/%.o, $(KERNEL_SRCFILES))
+KERNEL_OBJFILES := $(patsubst %.S, $(OBJDIR)/%.o, $(KERNEL_OBJFILES))
+KERNEL_OBJFILES := $(patsubst $(OBJDIR)/lib/%, $(OBJDIR)/kernel/%, $(KERNEL_OBJFILES))
+
+KERNEL_BINFILES := $(patsubst %, $(OBJDIR)/%, $(KERNEL_BINFILES))
+
+# How to build kernel object files
+$(OBJDIR)/kernel/%.o: kernel/%.c
+	@echo + cc $<
+	@mkdir -p $(@D)
+	$(V)$(CC) -nostdinc $(KERNEL_CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/kernel/%.o: kernel/%.S
+	@echo + as $<
+	@mkdir -p $(@D)
+	$(V)$(CC) -nostdinc $(KERNEL_CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/kernel/%.o: lib/%.c
+	@echo + cc $<
+	@mkdir -p $(@D)
+	$(V)$(CC) -nostdinc $(KERNEL_CFLAGS) -c -o $@ $<
+
+# How to build the kernel itself
+$(OBJDIR)/kernel/kernel: $(KERNEL_OBJFILES) $(KERNEL_BINFILES) kernel/kernel.ld
+	@echo + ld $@
+	$(V)$(LD) -o $@ $(KERNEL_LDFLAGS) $(KERNEL_OBJFILES) -b binary $(KERNEL_BINFILES)
+	$(V)$(OBJDUMP) -S $@ > $@.asm
+	$(V)$(NM) -n $@ > $@.sym
+
+# How to build the kernel disk image
+$(OBJDIR)/kernel/kernel.img: $(OBJDIR)/kernel/kernel $(OBJDIR)/boot/boot
+	@echo + mk $@
+	$(V)dd if=/dev/zero of=$(OBJDIR)/kernel/kernel.img~ count=10000 2>/dev/null
+	$(V)dd if=$(OBJDIR)/boot/boot of=$(OBJDIR)/kernel/kernel.img~ conv=notrunc 2>/dev/null
+	$(V)dd if=$(OBJDIR)/kernel/kernel of=$(OBJDIR)/kernel/kernel.img~ seek=1 conv=notrunc 2>/dev/null
+	$(V)mv $(OBJDIR)/kernel/kernel.img~ $(OBJDIR)/kernel/kernel.img
+
+all: $(OBJDIR)/kernel/kernel.img
+
+vbox: setup-vm
+	VBoxManage startvm $(KERNEL_NAME) --type sdl #gui
+
+setup-vm: $(OBJDIR)/kernel/kernel.img
+	@echo "Removing old vm/vdi instance" $(REMOVE_VM)
+	rm -f *.vdi
+	VBoxManage createvm --name $(KERNEL_NAME) --ostype Other --basefolder `pwd`/$(OBJDIR) --register
+	VBoxManage modifyvm $(KERNEL_NAME) --memory 256 --vram 16 --acpi on --ioapic on --cpus 2 --audio pulse --audiocontroller hda --bioslogodisplaytime 0 --bioslogoimagepath $(TOP)/docs/tantra-bios.bmp --boot1 disk --boot2 none --boot3 none --boot4 none --vrde on --vrdeport 3389 --vrdeauthtype null
+	VBoxManage convertdd $(OBJDIR)/kernel/kernel.img tantra.vdi
+	VBoxManage storagectl $(KERNEL_NAME) --name IDEController --add ide --bootable on
+	VBoxManage storageattach $(KERNEL_NAME) --storagectl IDEController  --port 0 --device 0 --type hdd --medium $(TOP)/tantra.vdi
+
+grub: $(OBJDIR)/tantra-grub
+
+$(OBJDIR)/tantra-grub: $(OBJDIR)/kernel/kernel
+	@echo + oc $@
+	$(V)$(OBJCOPY) --adjust-vma=0x10000000 $^ $@
+
+iso: grub
+	@echo making grub $@
+	cp $(OBJDIR)/tantra $(TOP)/staging
+	mkisofs -o tantra.iso -b boot/grub/stage2_eltorito -input-charset iso8859-1 -no-emul-boot -c boot.cat  -boot-load-size 32 -boot-info-table  -l -L -J -R -r $(TOP)/staging
+
