@@ -1,9 +1,11 @@
+#include <mmu.h>
+
 # This code runs from the first sector of booting media into memory at
 # physical address 0x7c00 and starts executing in real mode with
 # %cs=0 %ip=7c00
 
 .code16
-.globl start
+.globl start                           # Address is 0x7c00
 start:
   cli                                  # Disable interrupts
   xorw    %ax, %ax                     # Set segments to zero
@@ -40,47 +42,45 @@ iowait_8042.2:
 load_gdt:
   lgdt    gdt_table                    # Bootstraps GDT
   movl    %cr0, %eax                   # Switch to protected mode
-  orl     $0x1, %eax                   # Enable gate, 0x1
+  orl     $CR0_PE, %eax                # Enable gate for protected mode
   movl    %eax, %cr0                   # Enter Protected Mode
-  ljmp    $0x8, $protected_boot        # Far jump, but in 32-bit code segment
+
+# Now complete transition to 32-bit protected mode by indirectly modifying the
+# %cs using ljmp to reload %cs : %eip, use GDT[1] i.e. the kernel code segment
+# As each entry in the gdt table is 8 bytes long, hence we use a <<3 to select
+# that particular SEG_ entry
+  ljmp    $(SEG_KCODE<<3), $pmode      # Far jump, but in 32-bit code segment
 
 .code32                                # Assemble for 32-bit mode
-protected_boot:
-  movw    $0x10, %ax                   # Set protected mode segment registers
-  movw    %ax, %ds
+pmode:
+  movw    $(SEG_KDATA<<3), %ax         # Get our kernel data segment selector
+  movw    %ax, %ds                     # Initialize data, extra and stack segment
   movw    %ax, %es
   movw    %ax, %ss
   movw    %ax, %fs
   movw    %ax, %gs
 
   # Set up the stack pointer and call the C function
+  # stack grows down from start:0x7c00 to 0x0000, as memory from
+  # 0xa0000 to 0x100000 is littered with device memory regions
   movl    $start, %esp
   call    masterboot
 
 spin:
-  hlt
   jmp     spin
 
-# Bootstrap GDT
-# Structure: 8 byte long
-#   word(limit_low: The lower 16 bits of the limit)
-#   word(base_low: The lower 16 bits of the base)
-#   byte(base_middle: The next 8 bits of the base)
-#   byte(access: Access flags, determine what ring this segment can be used in)
-#   byte(granularity: bytes of kbytes)
-#   byte(base_high: The last 8 bits of the base)
+# Bootstrap GDT, each entry is 8 bytes long
+# We'll use paging hardware instead, so have base address equal to 0x0
+# and maximum limit equal to 4GB-1 (max usable memory on an x86 system)
+# and use SEG_ASM(type,base,lim) appropriately for code and data
+# This way in protected mode, logical addresses map 1:1 to physical ones
 
 .p2align 2                             # force 4 byte alignment
 gdt:
-  .word 0, 0                           # GDT[0]
-  .byte 0, 0, 0, 0                     # Dummy
-
-  .word 0xffff, 0x0000                 # GDT[1]
-  .byte 0x00, 0x9a, 0xcf, 0x00         # Code Segment, read/write only
-
-  .word 0xffff, 0x0000                 # GDT[2]
-  .byte 0x00, 0x92, 0xcf, 0x00         # Data Segment, write only
+  SEG_NULLASM                          # GDT[0], Null segment: dummy
+  SEG_ASM(STA_R|STA_X, 0x0,0xffffffff) # GDT[1], Code segment: read, executable only
+  SEG_ASM(STA_W, 0x0, 0xffffffff)      # GDT[2], Data segment: write only
 
 gdt_table:
-  .word   0x17                         # (sizeof(gdt) - 1) = 8(bytes) * 3 -1
+  .word   (gdt_table - gdt - 1)            # (sizeof(gdt) - 1) = 8(bytes) * 3 -1
   .long   gdt                          # Address of gdt
