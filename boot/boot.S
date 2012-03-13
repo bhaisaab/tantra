@@ -82,5 +82,8 @@ gdt:
   SEG_ASM(STA_W, 0x0, 0xffffffff)      # GDT[2], Data segment: write only
 
 gdt_table:
-  .word   (gdt_table - gdt - 1)            # (sizeof(gdt) - 1) = 8(bytes) * 3 -1
+  .word   (gdt_table - gdt - 1)        # (sizeof(gdt) - 1) = 8(bytes) * 3 -1
   .long   gdt                          # Address of gdt
+
+error_msg:
+   .asciz "Error, booting failed!"
