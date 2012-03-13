@@ -2,8 +2,8 @@ OBJDIRS += kernel
 
 KERNEL_LDFLAGS := $(LDFLAGS) -T kernel/kernel.ld -nostdlib
 
-KERNEL_SRCFILES :=	kernel/entry.S \
-										kernel/kernel.c \
+KERNEL_SRCFILES :=  kernel/entry.S \
+                    kernel/kernel.c \
                     lib/ctype.c \
                     lib/stdio.c \
                     lib/stdlib.c \
@@ -69,10 +69,11 @@ grub: $(OBJDIR)/tantra
 
 $(OBJDIR)/tantra: $(OBJDIR)/kernel/kernel
 	@echo + oc $@
-	$(V)$(OBJCOPY) --adjust-vma=0x100000 $^ $@
+	$(V) cp $^ $@ #$(OBJCOPY) --adjust-vma=0x100000 $^ $@
 
 iso: grub
 	@echo making grub $@
 	cp $(OBJDIR)/tantra $(TOP)/staging
 	mkisofs -o tantra.iso -b boot/grub/stage2_eltorito -input-charset iso8859-1 -no-emul-boot -c boot.cat  -boot-load-size 32 -boot-info-table  -l -L -J -R -r $(TOP)/staging
+	$(QEMU) -cdrom tantra.iso
 
