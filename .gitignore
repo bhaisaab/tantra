@@ -1,0 +1,6 @@
+obj
+*.iso
+*.vdi
+docs/*
+.gdbinit
+staging/tantra
