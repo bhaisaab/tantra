@@ -65,11 +65,11 @@ setup-vm: $(OBJDIR)/kernel/kernel.img
 	VBoxManage storagectl $(KERNEL_NAME) --name IDEController --add ide --bootable on
 	VBoxManage storageattach $(KERNEL_NAME) --storagectl IDEController  --port 0 --device 0 --type hdd --medium $(TOP)/tantra.vdi
 
-grub: $(OBJDIR)/tantra-grub
+grub: $(OBJDIR)/tantra
 
-$(OBJDIR)/tantra-grub: $(OBJDIR)/kernel/kernel
+$(OBJDIR)/tantra: $(OBJDIR)/kernel/kernel
 	@echo + oc $@
-	$(V)$(OBJCOPY) --adjust-vma=0x10000000 $^ $@
+	$(V)$(OBJCOPY) --adjust-vma=0x100000 $^ $@
 
 iso: grub
 	@echo making grub $@
