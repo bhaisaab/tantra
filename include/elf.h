@@ -5,33 +5,35 @@
 
 #define ELF_MAGIC 0x464C457FU /* "\x7FELF" in little endian */
 
-struct Elf {
-  uint32_t e_magic; // Must equal to ELF_MAGIC
-  uint8_t e_elf[12];
-  uint16_t e_type;
-  uint16_t e_machine;
-  uint32_t e_version;
-  uint32_t e_entry;
-  uint32_t e_phoff;
-  uint32_t e_shoff;
-  uint32_t e_flags;
-  uint16_t e_ehsize;
-  uint16_t e_phentsize;
-  uint16_t e_phnum;
-  uint16_t e_shentsize;
-  uint16_t e_shnum;
-  uint16_t e_shstrndx;
+// ELF file header
+struct elfhdr {
+  uint32_t magic;  // must equal ELF_MAGIC
+  uint8_t elf[12];
+  uint16_t type;
+  uint16_t machine;
+  uint32_t version;
+  uint32_t entry;
+  uint32_t phoff;
+  uint32_t shoff;
+  uint32_t flags;
+  uint16_t ehsize;
+  uint16_t phentsize;
+  uint16_t phnum;
+  uint16_t shentsize;
+  uint16_t shnum;
+  uint16_t shstrndx;
 };
 
-struct Proghdr {
-  uint32_t p_type;
-  uint32_t p_offset;
-  uint32_t p_va;
-  uint32_t p_pa;
-  uint32_t p_filesz;
-  uint32_t p_memsz;
-  uint32_t p_flags;
-  uint32_t p_align;
+// Program section header
+struct proghdr {
+  uint32_t type;
+  uint32_t off;
+  uint32_t vaddr;
+  uint32_t paddr;
+  uint32_t filesz;
+  uint32_t memsz;
+  uint32_t flags;
+  uint32_t align;
 };
 
 struct Secthdr {
@@ -47,21 +49,21 @@ struct Secthdr {
   uint32_t sh_entsize;
 };
 
-// Values for Proghdr::p_type
-#define ELF_PROG_LOAD       1
+// Values for proghdr::type
+#define ELF_PROG_LOAD           1
 
 // Flag bits for Proghdr::p_flags
-#define ELF_PROG_FLAG_EXEC  1
-#define ELF_PROG_FLAG_WRITE 2
-#define ELF_PROG_FLAG_READ  4
+#define ELF_PROG_FLAG_EXEC      1
+#define ELF_PROG_FLAG_WRITE     2
+#define ELF_PROG_FLAG_READ      4
 
 // Values for Secthdr::sh_type
-#define ELF_SHT_NULL        0
-#define ELF_SHT_PROGBITS    1
-#define ELF_SHT_SYMTAB      2
-#define ELF_SHT_STRTAB      3
+#define ELF_SHT_NULL            0
+#define ELF_SHT_PROGBITS        1
+#define ELF_SHT_SYMTAB          2
+#define ELF_SHT_STRTAB          3
 
 // Values for Secthdr::sh_name
-#define ELF_SHN_UNDEF       0
+#define ELF_SHN_UNDEF           0
 
 #endif
