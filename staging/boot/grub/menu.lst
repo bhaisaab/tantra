@@ -1,0 +1,7 @@
+default 5
+timeout 0
+hiddenmenu
+title Tantra
+root (cd)
+kernel /tantra
+boot
