@@ -17,6 +17,8 @@ typedef int32_t             intptr_t;
 typedef uint32_t            uintptr_t;
 typedef uint32_t            physaddr_t;
 
+typedef uint32_t            pde_t;
+
 #define MIN(_a, _b) \
 ({  \
   typeof(_a) __a = (_a);  \

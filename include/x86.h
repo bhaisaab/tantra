@@ -37,4 +37,13 @@ outw(int port, uint16_t data)
   __asm __volatile("outw %0,%w1" : : "a" (data), "d" (port));
 }
 
+static __inline void
+stosb(void *addr, int32_t data, int32_t cnt)
+{
+  __asm __volatile("cld; rep stosb" :
+               "=D" (addr), "=c" (cnt) :
+               "0" (addr), "1" (cnt), "a" (data) :
+               "memory", "cc");
+}
+
 #endif
