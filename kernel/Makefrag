@@ -4,6 +4,10 @@ KERNEL_LDFLAGS := $(LDFLAGS) -T kernel/kernel.ld -nostdlib
 
 KERNEL_SRCFILES :=  kernel/entry.S \
                     kernel/kernel.c \
+                    kernel/drivers/tty.c \
+                    kernel/drivers/vga.c \
+                    kernel/drivers/keyboard.c \
+                    kernel/drivers/rs232.c \
                     lib/ctype.c \
                     lib/stdio.c \
                     lib/stdlib.c \
