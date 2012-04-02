@@ -9,6 +9,6 @@
 #define NULL	((void *) 0)
 #endif
 
-void printf(char *, ...);
+void printf(const char *, ...);
 
 #endif
