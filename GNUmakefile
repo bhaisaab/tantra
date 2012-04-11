@@ -27,7 +27,7 @@ REMOVE_VM = $(shell if VBoxManage list vms | grep $(KERNEL_NAME); \
 
 # Compiler flags
 # Only optimize to -O1 to discourage inlining, which complicates backtraces.
-CFLAGS := $(CFLAGS) -O1 -fno-builtin -I$(TOP) -I$(TOP)/include/ -I$(TOP)/include/libc -MD
+CFLAGS := $(CFLAGS) -O1 -fno-builtin -I$(TOP) -I$(TOP)/include/ -I$(TOP)/include/libc -I$(TOP)/kernel -MD
 CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -Wall -Wno-format -Wno-unused -Werror -gstabs -m32
 
