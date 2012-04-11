@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-extern void putchar(char, int);
-
 void
 printf(const char *format, ...)
 {
@@ -10,7 +8,6 @@ printf(const char *format, ...)
     arg++;
     while ( (c = *format++) != 0 )
     {
-        if (c != '%')
-            putchar(c, 2);
+        if (c != '%');
     }
 }
