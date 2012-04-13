@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <drivers.h> // REMOVE ME when putc/write is fixed
 
-#define UNSIGNED 1
-#define SIGNED   2
+#define UNSIGNED 0
+#define SIGNED   1
 
 static int
 write(int fd, char c, int n)
@@ -17,6 +17,7 @@ putc(char c, int fd)
   write(fd, c, 1); // TODO: impl write syscall
 }
 
+//FIXME: I'm unreliable
 static int
 printnum(void (*putch)(char, int), int fd, int xx, int base, int sgn)
 {
@@ -72,11 +73,16 @@ vsprintf(void (*putch)(char, int), int fd, const char *fmt, va_list args)
     case 'u':
       len += printnum(putch, fd, va_arg(args, int), 10, signedness);
       break;
+    case 'l':
+      signedness |= SIGNED;
+      len += printnum(putch, fd, va_arg(args, long), 10, signedness);
+      break;
     case 'x':
+    case 'p':
       putch('0', fd);
       putch('x', fd);
       len += 2;
-      len += printnum(putch, fd, va_arg(args, unsigned long int), 16, signedness);
+      len += printnum(putch, fd, va_arg(args, uint32_t), 16, UNSIGNED);
       break;
     case 's':
       for (substr = va_arg(args, char*); *substr != '\0'; len++, substr++)

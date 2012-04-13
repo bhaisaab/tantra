@@ -38,7 +38,8 @@ kmain(unsigned long magic, unsigned long addr)
     kprintf("Booted by GRUB");
 
   kprintf(banner);
-  kprintf("kprintf test: %c %s %d %x %%\n", '@', "StRiNg", 1234567890, 0xdeadc0de);
+  kprintf("kprintf test: %c %s %d %x %%\n", '@', "StRiNg", -1234567890, 0xdeadc0de);
+  kprintf("machine sizes: int_8=%d int_16=%d int_32=%d int_64=%d\n", sizeof(int8_t), sizeof(int16_t), sizeof(int32_t), sizeof(int64_t));
 
   /* Initialize descriptor tables: gdt and idt */
 
