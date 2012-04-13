@@ -1,17 +1,20 @@
 #include <kdebug.h>
 #include <drivers.h>
 #include <stdarg.h>
-void
-kprintf(const char* format, ...)
+#include <stdio.h>
+
+static void
+kputc(char ch, int dummyfd)
 {
-  va_list ap;
-  va_start(ap, format);
-  char** arg = (char **) &format;
-  int c;
-  arg++;
-  while((c = *format++) != 0)
-  {
-    if(c != '%')
-      tty_putc(c, va_arg(ap, int));
-  }
+  tty_putc(ch);
+}
+
+int
+kprintf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+  int ret = vsprintf(kputc, -1, fmt, args);
+	va_end(args);
+  return ret;
 }

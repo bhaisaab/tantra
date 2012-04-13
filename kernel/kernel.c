@@ -32,54 +32,24 @@ kmain(unsigned long magic, unsigned long addr)
 {
   tty_init();
 
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-      kprintf("Booted by tantra", 0x8f);
-    else
-      kprintf("Booted by GRUB", 0x8f);
+  if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
+    kprintf("Booted by tantra");
+  else
+    kprintf("Booted by GRUB");
 
-    kprintf(banner, 2);
+  kprintf(banner);
+  kprintf("kprintf test: %c %s %d %x %%\n", '@', "StRiNg", 1234567890, 0xdeadc0de);
 
-    kprintf("Initializing GDT, IDT and drivers...\n\n", 2);
-    kprintf("2", 2);
-    kprintf("3", 3);
-    kprintf("4", 4);
-    kprintf("5", 5);
-    kprintf("6", 6);
-    kprintf("7", 7);
-    kprintf("8", 8);
-    kprintf("9", 9);
-    kprintf("10", 10);
-    kprintf("11", 11);
-    kprintf("12", 12);
-    kprintf("13", 13);
-    kprintf("14", 14);
-    kprintf("15", 15);
-    kprintf("Z", 0x10 + 0x7);
-    kprintf("Z", 0x20 + 0x7);
-    kprintf("Z", 0x30 + 0x7);
-    kprintf("Z", 0x40 + 0x7);
-    kprintf("Z", 0x50 + 0x7);
-    kprintf("Z", 0x60 + 0x7);
-    kprintf("Z", 0x70 + 0x7);
-    kprintf("Z", 0x80 + 0x7);
-    kprintf("Z", 0x90 + 0x7);
-    kprintf("Z", 0xa0 + 0x7);
-    kprintf("Z", 0xb0 + 0x7);
-    kprintf("Z", 0xc0 + 0x7);
-    kprintf("Z", 0xd0 + 0x7);
-    kprintf("Z", 0xe0 + 0x7);
-    kprintf("Z", 0xf0 + 0x7);
+  /* Initialize descriptor tables: gdt and idt */
 
-    /* Initialize descriptor tables: gdt and idt */
+  /* Intialize display and input */
 
-    /* Intialize display and input */
+  /* Initialize memory */
 
-    /* Initialize memory */
+  /* Initialize interrupt */
 
-    /* Initialize interrupt */
+  /* Initialize process */
 
-    /* Initialize process */
-
-    for(;;);
-    return 0xDEADBABA;
+  for(;;);
+  return 0xDEADBABA;
 }

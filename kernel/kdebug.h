@@ -1,6 +1,6 @@
 #ifndef KDEBUG_H
 #define KDEBUD_H
 
-void kprintf(const char* str, ...);
+int kprintf(const char* fmt, ...);
 
 #endif
