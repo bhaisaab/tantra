@@ -1,15 +1,15 @@
 #include <drivers.h>
 
 void vga_init(void);
-void vga_putc(char, int);
+void vga_putc(char);
 
 void kbd_init(void);
 void serial_init(void);
 
 void
-tty_putc(char c, int attribute)
+tty_putc(char c)
 {
-  vga_putc(c, attribute);
+  vga_putc(c);
 }
 
 void

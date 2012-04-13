@@ -1,5 +1,6 @@
 #include <drivers.h>
 #include <mmu.h>
+
 #define COLOR_FRAMEBUFFER  0xB8000
 #define MONO_FRAMEBUFFER   0xB0000
 
@@ -35,8 +36,9 @@ vga_scroll(void)
 }
 
 void
-vga_putc(char c, int attribute)
+vga_putc(char c) // TODO: Impl VT100 like term colors
 {
+  int attribute = 2;
   if(c == '\n' || c == '\r')
     return vga_scroll();
   *(video + (xpos + ypos * CRT_COLS) * 2)     = c & 0xFF;

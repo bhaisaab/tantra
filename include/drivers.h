@@ -4,6 +4,6 @@
 #include <types.h>
 
 void tty_init(void);
-void tty_putc(char, int);
+void tty_putc(char);
 
 #endif /* _DRIVERS_H_ */
