@@ -9,6 +9,14 @@
 #define NULL	((void *) 0)
 #endif
 
-void printf(const char *, ...);
+#define stdin    0
+#define stdout   1
+#define stderr   2
+
+int vsprintf(void (*)(char, int), int, const char *, va_list);
+int sprintf(char*, const char*, ...);
+
+int printf(const char *, ...);
+int fprintf(int, const char *, ...);
 
 #endif

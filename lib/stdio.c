@@ -1,13 +1,134 @@
 #include <stdio.h>
+#include <drivers.h> // REMOVE ME when putc/write is fixed
 
-void
-printf(const char *format, ...)
+#define UNSIGNED 1
+#define SIGNED   2
+
+static int
+write(int fd, char c, int n)
 {
-    char **arg = (char **) &format;
-    int c;
-    arg++;
-    while ( (c = *format++) != 0 )
-    {
-        if (c != '%');
+  tty_putc(c);
+  return 1;
+}
+
+static void
+putc(char c, int fd)
+{
+  write(fd, c, 1); // TODO: impl write syscall
+}
+
+static int
+printnum(void (*putch)(char, int), int fd, int xx, int base, int sgn)
+{
+  static char digits[] = "0123456789ABCDEF";
+  char buf[16];
+  int i, neg, ret;
+  uint32_t x;
+
+  neg = 0;
+  if(sgn && xx < 0){
+    neg = 1;
+    x = -xx;
+  } else {
+    x = xx;
+  }
+
+  i = 0;
+  do{
+    buf[i++] = digits[x % base];
+  }while((x /= base) != 0);
+  if(neg)
+    buf[i++] = '-';
+  ret = i;
+  while(--i >= 0)
+    putch(buf[i], fd);
+  return ret;
+}
+
+int
+vsprintf(void (*putch)(char, int), int fd, const char *fmt, va_list args)
+{
+  char *substr;
+  int i, ch, signedness = UNSIGNED, len;
+
+	va_start(args, fmt);
+  for (len = 0, i = 0; fmt[i]; i++) {
+    signedness = UNSIGNED;
+    ch = fmt[i] & 0xff;
+
+    if (ch != '%') {
+      putch(ch, fd);
+      len++;
+      continue;
     }
+
+    switch (ch) {
+    case 'c':
+      putch(va_arg(args, char), fd);
+      break;
+    case 'd':
+    case 'i':
+      signedness |= SIGNED;
+    case 'u':
+      len += printnum(putch, fd, va_arg(args, int), 10, signedness);
+      break;
+    case 'x':
+      len += printnum(putch, fd, va_arg(args, int), 16, signedness);
+      break;
+    case 's':
+      for (substr = va_arg(args, char*); *substr++ != '\0'; len++)
+        putch(*substr, fd);
+    case '%':
+      putch('%', fd);
+      len++;
+      break;
+    default:
+      putch('%', fd);
+      putch(ch, fd);
+      len += 2;
+      break;
+    }
+  }
+	va_end(ap);
+  putch('\0', fd);
+  return len+1;
+}
+
+static char* _bufPtr;
+
+static void
+_sprintfputch(char ch, int fd)
+{
+  *_bufPtr++ = ch;
+}
+
+int
+sprintf(char* buf, const char* fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  _bufPtr = buf;
+  int ret = vsprintf(_sprintfputch, -1, fmt, args);
+  va_end(args);
+  return ret;
+}
+
+int
+printf(const char *fmt, ...)
+{
+  va_list args;
+	va_start(args, fmt);
+	int ret = fprintf(stdout, fmt, args);
+	va_end(ap);
+  return ret;
+}
+
+int
+fprintf(int fd, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+  int ret = vsprintf(putc, fd, fmt, args);
+	va_end(ap);
+  return ret;
 }
