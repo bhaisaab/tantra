@@ -31,7 +31,7 @@ vga_scroll(void)
 {
   xpos = 0;
   ypos++;
-  if(ypos > CRT_ROWS)
+  if(ypos >= CRT_ROWS)
     ypos = 0;
 }
 
@@ -45,7 +45,7 @@ vga_putc(char c) // TODO: Impl VT100 like term colors
   *(video + (xpos + ypos * CRT_COLS) * 2 + 1) = attribute;
 
   xpos++;
-  if(xpos > CRT_ROWS)
+  if(xpos > CRT_COLS)
     vga_scroll();
 }
 
