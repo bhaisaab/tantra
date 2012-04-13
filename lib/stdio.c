@@ -20,7 +20,7 @@ putc(char c, int fd)
 static int
 printnum(void (*putch)(char, int), int fd, int xx, int base, int sgn)
 {
-  static char digits[] = "0123456789ABCDEF";
+  static char digits[] = "0123456789abcdef";
   char buf[16];
   int i, neg, ret;
   uint32_t x;
@@ -49,19 +49,19 @@ int
 vsprintf(void (*putch)(char, int), int fd, const char *fmt, va_list args)
 {
   char *substr;
-  int i, ch, signedness = UNSIGNED, len;
+  int i, signedness = UNSIGNED, len;
+  char ch;
 
-	va_start(args, fmt);
-  for (len = 0, i = 0; fmt[i]; i++) {
+  for (len = 0, i = 0; fmt[i];) {
     signedness = UNSIGNED;
-    ch = fmt[i] & 0xff;
+    ch = *(fmt+i++) & 0xff;
 
     if (ch != '%') {
       putch(ch, fd);
       len++;
       continue;
     }
-
+    ch = *(fmt+i++) & 0xff;
     switch (ch) {
     case 'c':
       putch(va_arg(args, char), fd);
@@ -73,11 +73,15 @@ vsprintf(void (*putch)(char, int), int fd, const char *fmt, va_list args)
       len += printnum(putch, fd, va_arg(args, int), 10, signedness);
       break;
     case 'x':
-      len += printnum(putch, fd, va_arg(args, int), 16, signedness);
+      putch('0', fd);
+      putch('x', fd);
+      len += 2;
+      len += printnum(putch, fd, va_arg(args, unsigned long int), 16, signedness);
       break;
     case 's':
-      for (substr = va_arg(args, char*); *substr++ != '\0'; len++)
+      for (substr = va_arg(args, char*); *substr != '\0'; len++, substr++)
         putch(*substr, fd);
+      break;
     case '%':
       putch('%', fd);
       len++;
@@ -89,9 +93,7 @@ vsprintf(void (*putch)(char, int), int fd, const char *fmt, va_list args)
       break;
     }
   }
-	va_end(ap);
-  putch('\0', fd);
-  return len+1;
+  return len;
 }
 
 static char* _bufPtr;
@@ -109,8 +111,9 @@ sprintf(char* buf, const char* fmt, ...)
   va_start(args, fmt);
   _bufPtr = buf;
   int ret = vsprintf(_sprintfputch, -1, fmt, args);
+  *_bufPtr = '\0';
   va_end(args);
-  return ret;
+  return ret+1;
 }
 
 int
@@ -118,7 +121,7 @@ printf(const char *fmt, ...)
 {
   va_list args;
 	va_start(args, fmt);
-	int ret = fprintf(stdout, fmt, args);
+	int ret = vsprintf(putc, stdout, fmt, args);
 	va_end(ap);
   return ret;
 }

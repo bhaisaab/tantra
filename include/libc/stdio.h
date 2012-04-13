@@ -14,7 +14,7 @@
 #define stderr   2
 
 int vsprintf(void (*)(char, int), int, const char *, va_list);
-int sprintf(char*, const char*, ...);
+int sprintf(char *, const char *, ...);
 
 int printf(const char *, ...);
 int fprintf(int, const char *, ...);
