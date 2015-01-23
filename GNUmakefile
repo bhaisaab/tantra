@@ -13,7 +13,7 @@ OBJDUMP := objdump
 PERL    := perl
 PYTHON  := python
 
-QEMU    := qemu
+QEMU    := qemu-system-i386
 
 # try to generate a unique GDB port
 GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
