@@ -12,7 +12,7 @@
 Tantra is a x86 unix based monolithic kernel development project.
 The sanskrit word `tantra` is means system, os:: संचालन (sanchalan: operating) तंत्र (tantra: system).
 
-Tantra was created from scratch by: `Rohit Yadav <rohityadav89@gmail.com>`
+This is fork based on MIT JOS
 
 ##Requirements
 
