@@ -10,9 +10,9 @@ CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 		 -nostartfiles -nodefaultlibs -c \
 		 -Wall -Wextra \
-		 -I./include -std=c11 -pedantic # -Werror
+		 -I./include -I./$(SRC) -std=c11 -pedantic # -Werror
 
-OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o
+OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o
 
 all: kernel.elf
 
@@ -41,7 +41,7 @@ iso: kernel.elf
 run: iso
 	bochs -f utils/bochsrc.txt -q
 
-run-qemu: iso
+run-qemu: clean iso
 	qemu-system-i386 -cdrom tantra.iso
 
 clean:
