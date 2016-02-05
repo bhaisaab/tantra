@@ -8,7 +8,9 @@ LDFLAGS = -T $(SRC)/link.ld -melf_i386
 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+		 -nostartfiles -nodefaultlibs -c \
+		 -Wall -Wextra \
+		 -I./include -std=c11 -pedantic # -Werror
 
 OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o
 
