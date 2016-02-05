@@ -1,37 +1,41 @@
-global loader                   ; the entry symbol for ELF
+global loader                               ; the entry symbol for ELF
 
-extern kmain
+extern kmain                                ; the entry symbol for C
 
-MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
-FLAGS        equ 0x0            ; multiboot flags
-CHECKSUM     equ -MAGIC_NUMBER  ; calculate the checksum
-                                ; (magic number + checksum + flags should equal 0)
+MAGIC_NUMBER  equ 0x1BADB002                ; define the magic number constant
+PAGE_ALIGN    equ 1<<0                      ; Load kernel and modules on a page boundary
+MEM_INFO      equ 1<<1                      ; Provide your kernel with memory info
+FLAGS         equ PAGE_ALIGN | MEM_INFO     ; multiboot flags i.e. ELF
+CHECKSUM      equ -(MAGIC_NUMBER + FLAGS)   ; calculate the checksum
+                                            ; (magic number + checksum + flags should equal 0)
 
-KERNEL_STACK_SIZE equ 4096      ; size of stack in bytes
+KSTACK_SIZE   equ 0x4000                    ; size of stack, 16kB
 
 section .bss
-align 4                         ; align at 4 bytes
-kernel_stack:                   ; label points to beginning of memory
-    resb KERNEL_STACK_SIZE      ; reserve stack for the kernel
+align 4                                     ; align at 4 bytes
+kernel_stack:                               ; label points to beginning of memory
+    resb KSTACK_SIZE                        ; reserve stack for the kernel
 
 
-section .text:                  ; start of the text (code) section
-align 4                         ; the code must be 4 byte aligned
-    dd MAGIC_NUMBER             ; write the magic number to the machine code,
-    dd FLAGS                    ; the flags,
-    dd CHECKSUM                 ; and the checksum
+section .text:                              ; start of the text (code) section
+align 4                                     ; the code must be 4 byte aligned
+    dd MAGIC_NUMBER                         ; write the magic number to the machine code,
+    dd FLAGS                                ; the flags,
+    dd CHECKSUM                             ; and the checksum
 
 
-loader:                         ; the loader label (defined as entry point in linker script)
+loader:                                     ; the loader label (defined as entry point in linker script)
 
 setup_kstack:
-    mov esp, kernel_stack + KERNEL_STACK_SIZE   ; point esp to the start of the
-                                                ; stack (end of memory area)
+    mov esp, kernel_stack + KSTACK_SIZE     ; point esp to the start of the
+                                            ; stack (end of memory area)
 
 call_kmain:
-    call kmain                  ; this pushes ebp (base pointer) and sets esp
-                                ; then calls the kmain, which sets 0xBADA55 on eax
-                                ; it pops ebp and returns
+    push ebx                                ; loads multiboot header location
+    push eax                                ; loads multiboot magic 0x1BADB002
+    call kmain                              ; this pushes ebp (base pointer) and sets esp
+                                            ; then calls the kmain, which sets 0xBADA55 on eax
+                                            ; it pops ebp and returns
 
 .loop:
-    jmp .loop                   ; loop forever
+    jmp .loop                               ; loop forever
