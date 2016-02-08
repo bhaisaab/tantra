@@ -5,30 +5,30 @@ const char* banner =
 #include <banner.h>
 ;
 
-static u16int *FB = (u16int *) FB_ADDRESS;
-static u16int s_fbx = 0;
-static u16int s_fby = 0;
+static uint16_t *FB = (uint16_t *) FB_ADDRESS;
+static uint16_t s_fbx = 0;
+static uint16_t s_fby = 0;
 
-static u16int s_attribute = 0x0200;
+static uint16_t s_attribute = 0x0200;
 
-static inline u16int fb_attribute_opts(u8int bg, u8int fg)
+static inline uint16_t fb_attribute_opts(uint8_t bg, uint8_t fg)
 {
     return ((((bg & 0x0f) << 4) | (fg & 0x0f)) << 8) & 0xff00;
 }
 
-static inline u16int fb_blank()
+static inline uint16_t fb_blank()
 {
    return ' ' | s_attribute;
 }
 
-static inline u16int fb_position()
+static inline uint16_t fb_position()
 {
    return (s_fby * FB_COLUMNS) + s_fbx;
 }
 
 static inline void fb_move_cursor()
 {
-    u16int location = fb_position();
+    uint16_t location = fb_position();
     outb(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);
     outb(FB_DATA_PORT,    ((location >> 8) & 0x00ff));
     outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
@@ -39,13 +39,13 @@ static inline void fb_scroll()
 {
     if (s_fby >= FB_ROWS)
     {
-        u16int blank = fb_blank();
-        for (int i = 0; i < FB_COLUMNS * (FB_ROWS - 1); i++)
+        uint16_t blank = fb_blank();
+        for (uint32_t i = 0; i < FB_COLUMNS * (FB_ROWS - 1); i++)
         {
             FB[i] = FB[i+80];
         }
 
-        for (int i = FB_COLUMNS * (FB_ROWS - 1); i < FB_COLUMNS * FB_ROWS; i++)
+        for (uint32_t i = FB_COLUMNS * (FB_ROWS - 1); i < FB_COLUMNS * FB_ROWS; i++)
         {
             FB[i] = blank;
         }
@@ -55,7 +55,7 @@ static inline void fb_scroll()
 
 void fb_put(char c)
 {
-    u16int location = fb_position();
+    uint32_t location = fb_position();
 
     if (c == 0x08 && s_fbx)
     {
@@ -87,8 +87,8 @@ void fb_put(char c)
 
 void fb_clear()
 {
-    u16int blank  = fb_blank();
-    for (int i = 0; i < FB_COLUMNS * FB_ROWS; i++)
+    uint32_t blank  = fb_blank();
+    for (uint32_t i = 0; i < FB_COLUMNS * FB_ROWS; i++)
     {
         FB[i] = blank;
     }
@@ -98,24 +98,24 @@ void fb_clear()
 
 void fb_print(const char *c)
 {
-    int i = 0;
+    uint32_t i = 0;
     while (c[i] != '\0')
     {
         fb_put(c[i++]);
     }
 }
 
-void fb_printcolor(const char* str, u8int bg, u8int fg)
+void fb_printcolor(const char* str, uint8_t bg, uint8_t fg)
 {
-    u16int original_attribute = s_attribute;
+    uint16_t original_attribute = s_attribute;
     s_attribute = fb_attribute_opts(bg, fg);
     fb_print(str);
     s_attribute = original_attribute;
 }
 
-void fb_putcolor(char c, u8int bg, u8int fg)
+void fb_putcolor(char c, uint8_t bg, uint8_t fg)
 {
-    u16int original_attribute = s_attribute;
+    uint16_t original_attribute = s_attribute;
     s_attribute = fb_attribute_opts(bg, fg);
     fb_put(c);
     s_attribute = original_attribute;
@@ -128,8 +128,8 @@ void fb_init()
     {
         char c = banner[idx];
         if (c == '\0') return;
-        int bg = FB_DGRAY;
-        int fg = FB_LGRAY;
+        uint8_t bg = FB_DGRAY;
+        uint8_t fg = FB_LGRAY;
 
         if (c == 'w')
         {
