@@ -17,6 +17,9 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
     fb_init();
     fb_print("> ");
 
+    __asm__("int $0x03");
+    __asm__("int $0x04");
+
     // 0xBADA55 now set on eax/rax register from C
     return 0xBADA55;
 }

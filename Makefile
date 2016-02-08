@@ -12,7 +12,9 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 		 -Wall -Wextra \
 		 -I./include -I./$(SRC) -std=c11 -pedantic # -Werror
 
-OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o $(SRC)/gdt.o $(SRC)/descriptor_table.o
+OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o \
+		  $(SRC)/idt.o $(SRC)/gdt.o $(SRC)/descriptor_table.o \
+		  $(SRC)/interrupt.o $(SRC)/isr.o
 
 all: kernel.elf
 
