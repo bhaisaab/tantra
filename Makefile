@@ -14,7 +14,8 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 
 OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o \
 		  $(SRC)/idt.o $(SRC)/gdt.o $(SRC)/descriptor_table.o \
-		  $(SRC)/interrupt.o $(SRC)/isr.o $(SRC)/timer.o
+		  $(SRC)/interrupt.o $(SRC)/isr.o \
+		  $(SRC)/timer.o $(SRC)/keyboard.o
 
 all: kernel.elf
 

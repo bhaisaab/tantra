@@ -4,6 +4,7 @@
 #include <io.h>
 #include <fb.h>
 #include <timer.h>
+#include <keyboard.h>
 
 uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
 {
@@ -16,18 +17,23 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
     // Initialize descriptor tables
     init_descriptor_tables();
 
-    // Initialize timer at 10hz
-    init_timer(10);
+    // Intialize framebuffer
+    init_fb();
 
-    fb_init();
-    fb_print("> ");
+    // Initialize timer at 100hz
+    init_timer(100);
 
-    __asm__("int $0x03");
-    __asm__("int $0x04");
+    // Initialize keyboard
+    init_keyboard();
 
     // Enable interrupts
     __asm__("sti");
 
+    // Dummy interrupts to test ISRs
+    //__asm__("int $0x03");
+    //__asm__("int $0x04");
+
+    fb_print("> ");
 
     // 0xBADA55 now set on eax/rax register from C
     return 0xBADA55;
