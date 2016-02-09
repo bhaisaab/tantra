@@ -38,10 +38,12 @@
 #define FB_LBROWN     0xe
 #define FB_WHITE      0xf
 
-void fb_init();
+void init_fb();
+
 void fb_clear();
 void fb_put(char c);
 void fb_print(const char *c);
 void fb_putdec(int32_t i);
+void fb_update_timer(uint32_t tick);
 
 #endif

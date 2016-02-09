@@ -2,13 +2,14 @@
 #include <isr.h>
 #include <fb.h>
 
-uint32_t tick = 0;
+static volatile uint32_t tick = 1;
 
 static void timer_callback(registers_t regs)
 {
     tick++;
-    fb_print("\nTick:");
-    fb_putdec(tick);
+    if (tick % 100 == 0) {
+        fb_update_timer(tick / 100);
+    }
     // TODO: scheduler
 }
 
@@ -20,7 +21,7 @@ void init_timer(uint32_t frequency)
    // The value we send to the PIT is the value to divide it's input clock
    // (1193180 Hz) by, to get our required frequency. Important to note is
    // that the divisor must be small enough to fit into 16-bits.
-   uint32_t divisor = 1193180 / frequency;
+   uint32_t divisor = 1193182 / frequency;
 
    // Send the command byte.
    outb(0x43, 0x36);

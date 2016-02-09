@@ -133,7 +133,20 @@ void fb_putcolor(char c, uint8_t bg, uint8_t fg)
     s_attribute = original_attribute;
 }
 
-void fb_init()
+void fb_update_timer(uint32_t tick)
+{
+    uint16_t tx = s_fbx;
+    uint16_t ty = s_fby;
+    s_fbx = 64;
+    s_fby = 0;
+    fb_print("Clock: ");
+    fb_putdec(tick);
+    fb_print("s");
+    s_fbx = tx;
+    s_fby = ty;
+}
+
+void init_fb()
 {
     fb_clear();
     for (int idx = 0; banner[idx] != '\0'; idx++)
