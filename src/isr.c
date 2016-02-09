@@ -33,7 +33,9 @@ void register_interrupt_handler(uint8_t n, isr_t handler)
 
 void isr_handler(registers_t regs)
 {
-    fb_print("Received interrupt: ");
+    fb_print("Received interrupt, num=");
+    fb_putdec(regs.int_no);
+    fb_print(", message=");
     if (regs.int_no < 20)
     {
         fb_print(exception_messages[regs.int_no]);

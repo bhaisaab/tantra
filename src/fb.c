@@ -40,7 +40,7 @@ static inline void fb_scroll()
     if (s_fby >= FB_ROWS)
     {
         uint16_t blank = fb_blank();
-        for (uint32_t i = 0; i < FB_COLUMNS * (FB_ROWS - 1); i++)
+        for (uint32_t i = 10 * FB_COLUMNS; i < FB_COLUMNS * (FB_ROWS - 1); i++)
         {
             FB[i] = FB[i+80];
         }
@@ -51,6 +51,18 @@ static inline void fb_scroll()
         }
         s_fby = (FB_ROWS - 1);
     }
+}
+
+static const char *ints = "0123456789";
+void fb_putdec(int32_t i)
+{
+    if (i <= 0)
+    {
+        return;
+    }
+    uint32_t place = i % 10;
+    fb_putdec(i / 10);
+    fb_put(ints[place]);
 }
 
 void fb_put(char c)
