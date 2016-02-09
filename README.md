@@ -1,12 +1,12 @@
 # Tantra
 
 <pre>
- \_\_    _/_/
-     \__/           Tantra is hobby unix-like kernel.
-     (o0)\________  The __sanskrit__ word `tantra` (तंत्र) means system.
+ \_\_    _/_/       <b>Tantra</b>
+     \__/           /तंत्र/ n. System (<a href="https://en.wikipedia.org/wiki/Sanskrit">sanskrit</a>)
+     (o0)\________  Hobby unix-like x86 kernel
      (#_)\ tantra )\
-        ||------w |
-        ||       ||
+         ||------w |
+         ||       ||
 </pre>
 
 ![Tantra](docs/screenshot.png)
