@@ -137,13 +137,19 @@ void fb_update_timer(uint32_t tick)
 {
     uint16_t tx = s_fbx;
     uint16_t ty = s_fby;
+    uint16_t ta = s_attribute;
+
     s_fbx = 64;
-    s_fby = 0;
-    fb_print("Clock: ");
+    s_fby = 1;
+    s_attribute = 0xe800;
+
+    fb_print(" Clock: ");
     fb_putdec(tick);
-    fb_print("s");
+    fb_print("s ");
+
     s_fbx = tx;
     s_fby = ty;
+    s_attribute = ta;
 }
 
 void init_fb()
