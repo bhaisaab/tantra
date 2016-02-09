@@ -5,4 +5,3 @@ idt_flush:
    lidt [eax]        ; Load the IDT pointer.
    ret
 
-
