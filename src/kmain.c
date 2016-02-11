@@ -5,6 +5,7 @@
 #include <fb.h>
 #include <timer.h>
 #include <keyboard.h>
+#include <paging.h>
 
 uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
 {
@@ -43,6 +44,9 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
 
     // Initialize keyboard
     init_keyboard();
+
+    // Initialize paging
+    init_paging();
 
     // Enable interrupts
     __asm__("sti");

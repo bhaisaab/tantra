@@ -15,7 +15,7 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o \
 		  $(SRC)/idt.o $(SRC)/gdt.o $(SRC)/descriptor_table.o \
 		  $(SRC)/interrupt.o $(SRC)/isr.o \
-		  $(SRC)/timer.o $(SRC)/keyboard.o
+		  $(SRC)/timer.o $(SRC)/keyboard.o $(SRC)/paging.o
 
 all: kernel.elf
 
@@ -45,7 +45,7 @@ run: iso
 	bochs -f utils/bochsrc.txt -q
 
 qemu: clean iso
-	qemu-system-i386 -cdrom tantra.iso
+	qemu-system-i386 -m 128M -cdrom tantra.iso
 
 clean:
 	rm -rf $(SRC)/*.o $(SRC)/kernel.elf iso/kernel.elf tantra.iso

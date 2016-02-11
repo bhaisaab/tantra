@@ -27,4 +27,12 @@ typedef struct page_directory
     uint32_t physicalAddr;
 } page_directory_t;
 
+void init_paging();
+
+void switch_page_directory(page_directory_t *pgd);
+
+page_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir);
+
+void page_fault(registers_t regs);
+
 #endif

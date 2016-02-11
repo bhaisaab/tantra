@@ -23,4 +23,6 @@ SECTIONS {
         *(COMMON)            /* all COMMON sections from all files */
         *(.bss)              /* all bss sections from all files */
     }
+
+    kernel_end = .; _kernel_end = .; __kernel_end = .;
 }
