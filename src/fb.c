@@ -53,6 +53,20 @@ static inline void fb_scroll()
     }
 }
 
+static const char *hexs = "0123456789abcdef";
+void fb_puthex(unsigned long h)
+{
+    if (h <= 0)
+    {
+        fb_print("0x");
+        return;
+    }
+    uint32_t place = h % 16;
+    fb_puthex(h / 16);
+    fb_put(hexs[place]);
+}
+
+
 static const char *ints = "0123456789";
 void fb_putdec(int32_t i)
 {

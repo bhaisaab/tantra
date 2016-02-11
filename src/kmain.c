@@ -14,11 +14,29 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
         return 0xD15EA5E;
     }
 
-    // Initialize descriptor tables
-    init_descriptor_tables();
-
     // Intialize framebuffer
     init_fb();
+
+    fb_print("Entry address = ");
+    fb_puthex(mboot_header->entry_addr);
+
+    fb_print("\nLoad address = ");
+    fb_puthex(mboot_header->load_addr);
+
+    fb_print("\nLoad end address = ");
+    fb_puthex(mboot_header->load_end_addr);
+
+    fb_print("\nHeader address = ");
+    fb_puthex(mboot_header->header_addr);
+
+    fb_print("\nFlags = ");
+    fb_puthex(mboot_header->flags);
+
+    fb_print("\nMagic = ");
+    fb_puthex(magic);
+
+    // Initialize descriptor tables
+    init_descriptor_tables();
 
     // Initialize timer at 100hz
     init_timer(100);
@@ -33,7 +51,7 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
     //__asm__("int $0x03");
     //__asm__("int $0x04");
 
-    fb_print("> ");
+    fb_print("\n> ");
 
     // 0xBADA55 now set on eax/rax register from C
     return 0xBADA55;

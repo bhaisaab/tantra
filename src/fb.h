@@ -43,7 +43,10 @@ void init_fb();
 void fb_clear();
 void fb_put(char c);
 void fb_print(const char *c);
+
 void fb_putdec(int32_t i);
+void fb_puthex(unsigned long h);
+
 void fb_update_timer(uint32_t tick);
 
 #endif
