@@ -5,7 +5,11 @@
 
 #define PAGE_SIZE 0x1000 // 4kB
 
-extern kernel_end;
+// Bitset algorithm, 32 for size of uint32_t
+#define INDEX_FROM_BIT(a) (a/(8*4))
+#define OFFSET_FROM_BIT(a) (a%(8*4))
+
+extern uint32_t kernel_end;
 
 uint32_t placement_address = (uint32_t)&kernel_end;
 
@@ -54,9 +58,62 @@ uint32_t kmalloc_alignedp(uint32_t sz, uint32_t *phys)
     return kmalloc_internal(sz, 1, phys);
 }
 
+static void set_frame(uint32_t frame_addr)
+{
+    uint32_t frame = frame_addr/PAGE_SIZE;
+    frames[INDEX_FROM_BIT(frame)] |= (0x1 << OFFSET_FROM_BIT(frame));
+}
+
+static void clear_frame(uint32_t frame_addr)
+{
+    uint32_t frame = frame_addr/PAGE_SIZE;
+    frames[INDEX_FROM_BIT(frame)] &= ~(0x1 << OFFSET_FROM_BIT(frame));
+}
+
+static uint32_t test_frame(uint32_t frame_addr)
+{
+    uint32_t frame = frame_addr/PAGE_SIZE;
+    return frames[INDEX_FROM_BIT(frame)] & (0x1 << OFFSET_FROM_BIT(frame));
+}
+
+static int32_t get_first_available_frame()
+{
+    for (uint32_t i = 0; i < INDEX_FROM_BIT(nframes); i++) {
+        if (frames[i] != 0xffffffff) {
+            for (int j = 0; j < 32; j++) {
+                if (!(frames[i] & (0x1 << j))) {
+                    return 32 * i + j;
+                }
+            }
+        }
+    }
+    return -1;
+}
+
 void alloc_frame(page_t *page, uint8_t is_kernel, uint8_t is_writeable)
 {
-    // TODO: implement paging algorithm
+    if (page->frame != 0) {
+        return; // frame already allocated
+    } else {
+        int32_t free_frame_idx = get_first_available_frame();
+        if (free_frame_idx < 0) {
+            // TODO: raise PANIC, OOM
+        }
+        set_frame(PAGE_SIZE * free_frame_idx);
+        page->present = 1;
+        page->frame = free_frame_idx;
+        page->rw = (is_writeable ? 1 : 0);
+        page->user = (is_kernel ? 0 : 1);
+    }
+}
+
+void dealloc_frame(page_t *page)
+{
+    if (page->frame != 0) {
+        clear_frame(page->frame);
+        page->frame = 0;
+        page->present = 0;
+    }
 }
 
 void switch_page_directory(page_directory_t *dir)
@@ -89,7 +146,7 @@ page_t *get_page(uint32_t address, uint8_t make, page_directory_t *dir)
     return 0;
 }
 
-void page_fault(registers_t regs)
+void page_fault_handler(registers_t regs)
 {
     // A page fault has occurred.
     // The faulting address is stored in the CR2 register.
@@ -104,11 +161,12 @@ void page_fault(registers_t regs)
     int id = regs.err_code & 0x10;          // Caused by an instruction fetch?
 
     // Output an error message.
-    fb_print("Page fault! ( ");
-    if (present) {fb_print("present ");}
-    if (rw) {fb_print("read-only ");}
-    if (us) {fb_print("user-mode ");}
-    if (reserved) {fb_print("reserved ");}
+    fb_print("Page fault! (");
+    if (present) {fb_print("present,");}
+    if (rw) {fb_print("read-only,");}
+    if (us) {fb_print("user-mode,");}
+    if (reserved) {fb_print("reserved,");}
+    if (id) {fb_print("instruction-fetch caused,");}
     fb_print(") at ");
     fb_puthex(faulting_address);
     fb_print("\n");
@@ -121,25 +179,23 @@ void init_paging()
     // TODO: get physical memory size
     uint32_t total_physical_memory = 0x1000000; // Assume 16MiB for now
     nframes = total_physical_memory / PAGE_SIZE;
-    frames = (uint32_t*) kmalloc(nframes);
-    memset(frames, 0, nframes);
+    frames = (uint32_t*) kmalloc(INDEX_FROM_BIT(nframes));
+    memset(frames, 0, INDEX_FROM_BIT(nframes));
 
     kernel_directory = (page_directory_t*)kmalloc_aligned(sizeof(page_directory_t));
+    memset(kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
 
     fb_print("\nPaging Placement address = ");
     fb_puthex(placement_address);
+    fb_print("\n");
 
     for (uint32_t i = 0; i < placement_address; i += PAGE_SIZE) {
         alloc_frame(get_page(i, 1, kernel_directory), 0, 0);
     }
 
     // Register page fault handler
-    register_interrupt_handler(14, page_fault);
-
-    // FIXME: with no frames allocated enabling paging causes double page fault
-    // ... a good way to force restarts though :)
-    return;
+    register_interrupt_handler(14, page_fault_handler);
 
     // Enable paging
     switch_page_directory(kernel_directory);

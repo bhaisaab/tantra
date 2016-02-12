@@ -55,7 +55,9 @@ uint32_t kmain(unsigned long magic, multiboot_header_t *mboot_header)
     //__asm__("int $0x03");
     //__asm__("int $0x04");
 
-    fb_print("\n> ");
+    // Test page fault
+    //uint32_t *ptr = (uint32_t*) 0xDEADFA11;
+    //uint32_t do_page_fault = *ptr;
 
     // 0xBADA55 now set on eax/rax register from C
     return 0xBADA55;
