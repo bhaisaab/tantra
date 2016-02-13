@@ -66,7 +66,6 @@ void fb_puthex(unsigned long long h)
     fb_put(hexs[place]);
 }
 
-
 static const char *ints = "0123456789";
 void fb_putdec(int32_t i)
 {

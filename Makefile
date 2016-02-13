@@ -45,7 +45,7 @@ run: iso
 	bochs -f utils/bochsrc.txt -q
 
 qemu: clean iso
-	qemu-system-i386 -m 128M -cdrom tantra.iso
+	qemu-system-i386 -m 32M -cdrom tantra.iso
 
 clean:
 	rm -rf $(SRC)/*.o $(SRC)/kernel.elf iso/kernel.elf tantra.iso
