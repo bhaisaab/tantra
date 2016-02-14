@@ -183,6 +183,5 @@ void init_fb()
         fb_putcolor(c, bg, fg);
     }
     fb_printcolor("Welcome to Tantra. Type h or ? to get started...\n", FB_LCYAN, FB_BLACK);
-    fb_print("> ");
 }
 

@@ -7,6 +7,8 @@
 #include <keyboard.h>
 #include <paging.h>
 
+extern uint32_t loader;
+
 uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
 {
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
@@ -18,6 +20,9 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
     // Intialize framebuffer
     init_fb();
 
+    fb_print("Kernel loading linear address = ");
+    fb_puthex(loader);
+
     fb_print("\nGrub magic = ");
     fb_puthex(magic);
 
@@ -26,24 +31,17 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
         fb_print(mboot->cmdline);
     }
 
-    fb_print("\nGrub multiboot flags = ");
-    fb_puthex(mboot->flags);
-
-    fb_print("\nMemory Lower = ");
-    fb_puthex(mboot->mem_lower);
-
-    fb_print("\nMemory Upper = ");
-    fb_puthex(mboot->mem_upper);
-
     uint32_t availableMemory = 0;
     multiboot_memory_map_t *mmap = mboot->mmap_addr;
     while (mmap < (mboot->mmap_addr + mboot->mmap_length)) {
-        fb_print("\n  mmap mem_type = ");
+        fb_print("\n  mmap type = ");
         fb_puthex(mmap->type);
-        fb_print(" mem_size = ");
+        fb_print(" size = ");
         fb_putdec(mmap->len / 1024);
-        fb_print("kB mem_address = ");
+        fb_print("kB addr = ");
         fb_puthex(mmap->addr);
+        fb_print("kB end_addr = ");
+        fb_puthex(mmap->addr + mmap->len);
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
             availableMemory += mmap->len;
         }
