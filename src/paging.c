@@ -174,10 +174,9 @@ void page_fault_handler(registers_t regs)
     for(;;);
 }
 
-void init_paging()
+void init_paging(uint32_t available_memory)
 {
-    // TODO: get physical memory size
-    uint32_t total_physical_memory = 0x1000000; // Assume 16MiB for now
+    uint32_t total_physical_memory = available_memory;
     nframes = total_physical_memory / PAGE_SIZE;
     frames = (uint32_t*) kmalloc(INDEX_FROM_BIT(nframes));
     memset(frames, 0, INDEX_FROM_BIT(nframes));

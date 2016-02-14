@@ -27,7 +27,7 @@ typedef struct page_directory
     uint32_t physicalAddr;
 } page_directory_t;
 
-void init_paging();
+void init_paging(uint32_t available_memory);
 
 void switch_page_directory(page_directory_t *pgd);
 

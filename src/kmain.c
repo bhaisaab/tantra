@@ -35,7 +35,7 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
     fb_print("\nMemory Upper = ");
     fb_puthex(mboot->mem_upper);
 
-    uint32_t availableMemoryKB = 0;
+    uint32_t availableMemory = 0;
     multiboot_memory_map_t *mmap = mboot->mmap_addr;
     while (mmap < (mboot->mmap_addr + mboot->mmap_length)) {
         fb_print("\n  mmap mem_type = ");
@@ -45,13 +45,13 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
         fb_print("kB mem_address = ");
         fb_puthex(mmap->addr);
         if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE) {
-            availableMemoryKB += mmap->len / 1024;
+            availableMemory += mmap->len;
         }
         mmap = (multiboot_memory_map_t*) ((uint32_t)mmap + mmap->size + sizeof(uint32_t));
     }
 
-    fb_print("\nAvailable Physical Memory (MB) = ");
-    fb_putdec(availableMemoryKB / 1024);
+    fb_print("\nAvailable Physical Memory (kB) = ");
+    fb_putdec(availableMemory / 1024);
 
     // Initialize descriptor tables
     init_descriptor_tables();
@@ -63,7 +63,7 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
     init_keyboard();
 
     // Initialize paging
-    init_paging();
+    init_paging(availableMemory);
 
     // Enable interrupts
     __asm__("sti");

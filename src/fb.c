@@ -40,7 +40,7 @@ static inline void fb_scroll()
     if (s_fby >= FB_ROWS)
     {
         uint16_t blank = fb_blank();
-        for (uint32_t i = 10 * FB_COLUMNS; i < FB_COLUMNS * (FB_ROWS - 1); i++)
+        for (uint32_t i = 8 * FB_COLUMNS; i < FB_COLUMNS * (FB_ROWS - 1); i++)
         {
             FB[i] = FB[i+80];
         }
