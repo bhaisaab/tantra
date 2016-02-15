@@ -2,6 +2,7 @@ KERNEL=kernel.elf
 SRC=src/
 OBJDIR=build/
 ISO=iso/
+BUILD_DIRS=$(OBJDIR)boot $(OBJDIR)drivers $(OBJDIR)kernel $(OBJDIR)mm
 
 .PHONY: $(KERNEL)
 .PHONY: clean
@@ -9,31 +10,33 @@ ISO=iso/
 AS=nasm
 CC=gcc
 LD=ld
-INC_PATH=-I$(SRC)/include -I$(SRC)/include/libc -I$(SRC)
+INC_PATH=-I$(SRC)/include -I$(SRC)/include/tantra -I$(SRC)/include/libc -I$(SRC)
 ASFLAGS=-f elf32
 CFLAGS=-m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector  -nostartfiles -nodefaultlibs -c -Wall -Wextra $(INC_PATH) -std=c11 -pedantic # -Werror
 LDFLAGS=-T $(SRC)/link.ld -melf_i386
 
-DOTFILES = boot/boot.o kmain.o io.o fb.o \
-		  idt.o gdt.o descriptor_table.o \
-		  interrupt.o isr.o \
-		  timer.o keyboard.o paging.o
+DOTFILES = boot/boot.o \
+		  boot/idt.o boot/gdt.o boot/io.o \
+		  drivers/fb.o drivers/keyboard.o \
+		  kernel/kmain.o kernel/descriptor_table.o \
+		  kernel/interrupt.o kernel/isr.o kernel/timer.o \
+		  mm/paging.o
 
 OBJ = $(patsubst %,$(OBJDIR)%,$(DOTFILES))
 
 $(OBJDIR)%.o: $(SRC)%.c
 	@echo [CC] $<
-	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@mkdir -p $(BUILD_DIRS)
 	@$(CC) $(CFLAGS)  -o $@ $<
 
 $(OBJDIR)%.o: $(SRC)%.s
 	@echo [AS] $<
-	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@mkdir -p $(BUILD_DIRS)
 	@$(AS) $(ASFLAGS) -o $@ $<
 
 $(KERNEL): $(OBJ)
 	@echo [INFO] Linking Kernel ELF
-	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@mkdir -p $(BUILD_DIRS)
 	@$(LD) $(LDFLAGS) $(OBJ) -o $(OBJDIR)/kernel.elf
 
 all: $(KERNEL)
