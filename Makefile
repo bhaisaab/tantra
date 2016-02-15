@@ -1,36 +1,47 @@
-SRC=src
+KERNEL=kernel.elf
+SRC=src/
+OBJDIR=build/
+ISO=iso/
 
-AS = nasm
-ASFLAGS = -f elf32
+.PHONY: $(KERNEL)
+.PHONY: clean
 
+AS=nasm
+CC=gcc
 LD=ld
-LDFLAGS = -T $(SRC)/link.ld -melf_i386
+INC_PATH=-I$(SRC)/include -I$(SRC)/include/libc -I$(SRC)
+ASFLAGS=-f elf32
+CFLAGS=-m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector  -nostartfiles -nodefaultlibs -c -Wall -Wextra $(INC_PATH) -std=c11 -pedantic # -Werror
+LDFLAGS=-T $(SRC)/link.ld -melf_i386
 
-CC = gcc
-CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-		 -nostartfiles -nodefaultlibs -c \
-		 -Wall -Wextra \
-		 -I./include -I./$(SRC) -std=c11 -pedantic # -Werror
+DOTFILES = boot/boot.o kmain.o io.o fb.o \
+		  idt.o gdt.o descriptor_table.o \
+		  interrupt.o isr.o \
+		  timer.o keyboard.o paging.o
 
-OBJECTS = $(SRC)/boot.o $(SRC)/kmain.o $(SRC)/io.o $(SRC)/fb.o \
-		  $(SRC)/idt.o $(SRC)/gdt.o $(SRC)/descriptor_table.o \
-		  $(SRC)/interrupt.o $(SRC)/isr.o \
-		  $(SRC)/timer.o $(SRC)/keyboard.o $(SRC)/paging.o
+OBJ = $(patsubst %,$(OBJDIR)%,$(DOTFILES))
 
-all: kernel.elf
+$(OBJDIR)%.o: $(SRC)%.c
+	@echo [CC] $<
+	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@$(CC) $(CFLAGS)  -o $@ $<
 
-%.o: %.c
-	$(CC) $(CFLAGS)  $< -o $@
+$(OBJDIR)%.o: $(SRC)%.s
+	@echo [AS] $<
+	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@$(AS) $(ASFLAGS) -o $@ $<
 
-%.o: %.s
-	$(AS) $(ASFLAGS) $< -o $@
+$(KERNEL): $(OBJ)
+	@echo [INFO] Linking Kernel ELF
+	@mkdir -p $(OBJDIR) $(OBJDIR)/boot
+	@$(LD) $(LDFLAGS) $(OBJ) -o $(OBJDIR)/kernel.elf
 
-kernel.elf: $(OBJECTS)
-	$(LD) $(LDFLAGS) $(OBJECTS) -o $(SRC)/kernel.elf
+all: $(KERNEL)
 
-iso: kernel.elf
-	cp $(SRC)/kernel.elf iso/kernel.elf
-	genisoimage -R                              \
+iso: $(KERNEL)
+	@cp $(OBJDIR)/kernel.elf $(ISO)/kernel.elf
+	@echo [INFO] Building ISO image
+	@genisoimage -R                             \
 				-b boot/grub/stage2_eltorito    \
 				-no-emul-boot                   \
 				-boot-load-size 4               \
@@ -38,14 +49,17 @@ iso: kernel.elf
 				-input-charset utf8             \
 				-quiet                          \
 				-boot-info-table                \
-				-o tantra.iso                   \
+				-o $(OBJDIR)tantra.iso          \
 				iso
 
 run: iso
-	bochs -f utils/bochsrc.txt -q
+	@echo [INFO] Starting kernel on Bochs
+	@bochs -f utils/bochsrc.txt -q
 
 qemu: clean iso
-	qemu-system-i386 -m 32M -cdrom tantra.iso
+	@echo [INFO] Starting kernel on Qemu
+	@qemu-system-i386 -m 32M -cdrom $(OBJDIR)tantra.iso
 
 clean:
-	rm -rf $(SRC)/*.o $(SRC)/kernel.elf iso/kernel.elf tantra.iso
+	@echo [INFO] Cleaning build directory and other artifacts
+	@rm -rf $(OBJDIR) iso/kernel.elf tantra.iso
