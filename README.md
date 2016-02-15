@@ -45,6 +45,7 @@ Use bochs to step into instructions and see registers in action:
 - [Adelaideos Teaching OS](http://adelaideos.sourceforge.net)
 - [Sortix](https://sortix.org)
 - [Aenix](https://github.com/helino/aenix)
+- [JS linux](https://github.com/levskaya/jslinux-deobfuscated)
 
 ### Articles
 
