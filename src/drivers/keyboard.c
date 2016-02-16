@@ -40,7 +40,7 @@ static const uint8_t shifted_keyboard_map[] =
 
 static volatile uint8_t shift_pressed = 0;
 
-static void keyboard_callback(registers_t regs)
+static void keyboard_callback(/*registers_t regs*/)
 {
     if (inb(KEYBOARD_STATUS_PORT) & 0x01) {
         uint8_t keycode = inb(KEYBOARD_DATA_PORT);

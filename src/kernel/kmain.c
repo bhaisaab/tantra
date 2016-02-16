@@ -28,12 +28,12 @@ uint32_t kmain(unsigned long magic, multiboot_info_t *mboot)
 
     if (mboot->flags & (1 << 2)) {
         fb_print("\nGrub cmdline = ");
-        fb_print(mboot->cmdline);
+        fb_print((const char*)mboot->cmdline);
     }
 
     uint32_t availableMemory = 0;
-    multiboot_memory_map_t *mmap = mboot->mmap_addr;
-    while (mmap < (mboot->mmap_addr + mboot->mmap_length)) {
+    multiboot_memory_map_t *mmap = (multiboot_memory_map_t*) mboot->mmap_addr;
+    while (mmap < (multiboot_memory_map_t*)(mboot->mmap_addr + mboot->mmap_length)) {
         fb_print("\n  mmap type = ");
         fb_puthex(mmap->type);
         fb_print(" size = ");

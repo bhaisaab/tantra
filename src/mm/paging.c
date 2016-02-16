@@ -70,11 +70,13 @@ static void clear_frame(uint32_t frame_addr)
     frames[INDEX_FROM_BIT(frame)] &= ~(0x1 << OFFSET_FROM_BIT(frame));
 }
 
+/*
 static uint32_t test_frame(uint32_t frame_addr)
 {
     uint32_t frame = frame_addr/PAGE_SIZE;
     return frames[INDEX_FROM_BIT(frame)] & (0x1 << OFFSET_FROM_BIT(frame));
 }
+*/
 
 static int32_t get_first_available_frame()
 {

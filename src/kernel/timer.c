@@ -4,7 +4,7 @@
 
 static volatile uint32_t tick = 1;
 
-static void timer_callback(registers_t regs)
+static void timer_callback(/*registers_t regs*/)
 {
     tick++;
     if (tick % 100 == 0) {
