@@ -27,6 +27,24 @@ Use bochs to step into instructions and see registers in action:
     make run
 
 
+### Roadmap
+
+Things that are yet to be implemented:
+
+- Fairly useful libc
+- Improving x86 paging and frame mapping/allocation
+- Implement syscalls and errnos (s/w based interrupts)
+- Refactor and improve memory management and heap allocation (sbrk, malloc, free etc)
+- Implement Virtual File System and ext2/custom-fs implementation
+- Fix build system to move away from iso to a real HDD
+- Init ramdisk
+- Implement multitasking, COW, processes (fork etc)
+- Implement scheduler for user processes
+- Usermode apps: init, shell, fs related (mkdir, ls etc), cat, echo, etc.
+- Support multiple cpus/core, SMP
+- VGA graphics
+- Networking
+
 ## References
 
 ### Tutorials
