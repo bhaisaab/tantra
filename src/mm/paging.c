@@ -1,5 +1,6 @@
 #include <paging.h>
 #include <stdint.h>
+#include <string.h>
 #include <fb.h>
 #include <isr.h>
 
@@ -18,14 +19,6 @@ uint32_t nframes;
 
 page_directory_t* kernel_directory = 0;
 page_directory_t* current_directory = 0;
-
-void memset(void* ptr, uint8_t chr, uint32_t size)
-{
-    uint8_t *p = (uint8_t*) ptr;
-    while (size > 0 && size--) {
-        *p++ = chr;
-    }
-}
 
 uint32_t kmalloc_internal(uint32_t sz, uint8_t align, uint32_t *phys)
 {

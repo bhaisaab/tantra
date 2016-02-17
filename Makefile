@@ -2,7 +2,7 @@ KERNEL=kernel.elf
 SRC=src/
 OBJDIR=build/
 ISO=iso/
-BUILD_DIRS=$(OBJDIR)boot $(OBJDIR)drivers $(OBJDIR)kernel $(OBJDIR)mm
+BUILD_DIRS=$(OBJDIR)boot $(OBJDIR)drivers $(OBJDIR)kernel $(OBJDIR)mm $(OBJDIR)libc
 
 .PHONY: $(KERNEL)
 .PHONY: clean
@@ -20,7 +20,8 @@ DOTFILES = boot/boot.o \
 		  drivers/fb.o drivers/keyboard.o \
 		  kernel/kmain.o kernel/descriptor_table.o \
 		  kernel/interrupt.o kernel/isr.o kernel/timer.o \
-		  mm/paging.o
+		  mm/paging.o \
+		  libc/string.o
 
 OBJ = $(patsubst %,$(OBJDIR)%,$(DOTFILES))
 
