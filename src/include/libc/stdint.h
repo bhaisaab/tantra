@@ -10,4 +10,11 @@ typedef          char  int8_t;
 
 typedef unsigned int   size_t;
 
+#define TRUE    1
+#define FALSE   0
+
+typedef unsigned char  bool;
+
+#define UNUSED(x) (void)(x)
+
 #endif
