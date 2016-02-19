@@ -18,7 +18,7 @@ Available build profiles:
     make all
     make iso
     make run
-    make run-qemu
+    make qemu
 
 ### Debugging
 
@@ -32,9 +32,9 @@ Use bochs to step into instructions and see registers in action:
 Things that are yet to be implemented:
 
 - Fairly useful libc
-- Improving x86 paging and frame mapping/allocation
 - Implement syscalls and errnos (s/w based interrupts)
 - Refactor and improve memory management and heap allocation (sbrk, malloc, free etc)
+- Improving x86 paging and frame mapping/allocation
 - Implement Virtual File System and ext2/custom-fs implementation
 - Fix build system to move away from iso to a real HDD
 - Init ramdisk
