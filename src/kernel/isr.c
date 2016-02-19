@@ -2,6 +2,8 @@
 #include <isr.h>
 #include <fb.h>
 
+#include <kdebug.h>
+
 const char* exception_messages[] = {
     "Division By Zero Exception",
     "Debug Exception",
@@ -33,13 +35,10 @@ void register_interrupt_handler(uint8_t n, isr_t handler)
 
 void isr_handler(registers_t regs)
 {
-    fb_print("\n[Received interrupt] code=");
-    fb_putdec(regs.int_no);
-    fb_print(", message=");
+    kprintf("\n[Interrupt] code=%d", regs.int_no);
     if (regs.int_no < 20) {
-        fb_print(exception_messages[regs.int_no]);
+        kprintf("\n[Interrupt] message=%s", exception_messages[regs.int_no]);
     }
-    fb_print("\n");
 
    if (interrupt_handlers[regs.int_no] != 0) {
        isr_t handler = interrupt_handlers[regs.int_no];

@@ -1,5 +1,7 @@
-#include "fb.h"
-#include "stdint.h"
+#include <fb.h>
+#include <stdint.h>
+
+#include <kdebug.h>
 
 const char* banner =
 #include <banner.h>
@@ -51,31 +53,6 @@ static inline void fb_scroll()
         }
         s_fby = (FB_ROWS - 1);
     }
-}
-
-static const char *hexs = "0123456789abcdef";
-void fb_puthex(unsigned long long h)
-{
-    if (h <= 0)
-    {
-        fb_print("0x");
-        return;
-    }
-    uint32_t place = h % 16;
-    fb_puthex(h / 16);
-    fb_put(hexs[place]);
-}
-
-static const char *ints = "0123456789";
-void fb_putdec(int32_t i)
-{
-    if (i <= 0)
-    {
-        return;
-    }
-    uint32_t place = i % 10;
-    fb_putdec(i / 10);
-    fb_put(ints[place]);
 }
 
 void fb_put(char c)
@@ -130,15 +107,7 @@ void fb_print(const char *c)
     }
 }
 
-void fb_printcolor(const char* str, uint8_t bg, uint8_t fg)
-{
-    uint16_t original_attribute = s_attribute;
-    s_attribute = fb_attribute_opts(bg, fg);
-    fb_print(str);
-    s_attribute = original_attribute;
-}
-
-void fb_putcolor(char c, uint8_t bg, uint8_t fg)
+static void fb_putcolor(char c, uint8_t bg, uint8_t fg)
 {
     uint16_t original_attribute = s_attribute;
     s_attribute = fb_attribute_opts(bg, fg);
@@ -156,9 +125,7 @@ void fb_update_timer(uint32_t tick)
     s_fby = 1;
     s_attribute = 0xe800;
 
-    fb_print(" Clock: ");
-    fb_putdec(tick);
-    fb_print("s ");
+    kprintf(" Clock: %us ", tick);
 
     s_fbx = tx;
     s_fby = ty;
@@ -182,6 +149,5 @@ void init_fb()
         }
         fb_putcolor(c, bg, fg);
     }
-    fb_printcolor("Welcome to Tantra. Type h or ? to get started...\n", FB_LCYAN, FB_BLACK);
 }
 

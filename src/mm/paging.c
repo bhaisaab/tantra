@@ -4,6 +4,8 @@
 #include <fb.h>
 #include <isr.h>
 
+#include <kdebug.h>
+
 #define PAGE_SIZE 0x1000 // 4kB
 
 // Bitset algorithm, 32 for size of uint32_t
@@ -156,16 +158,8 @@ void page_fault_handler(registers_t regs)
     int id = regs.err_code & 0x10;          // Caused by an instruction fetch?
 
     // Output an error message.
-    fb_print("Page fault! (");
-    if (present) {fb_print("present,");}
-    if (rw) {fb_print("read-only,");}
-    if (us) {fb_print("user-mode,");}
-    if (reserved) {fb_print("reserved,");}
-    if (id) {fb_print("instruction-fetch caused,");}
-    fb_print(") at ");
-    fb_puthex(faulting_address);
-    fb_print("\n");
-    fb_print("PAGE FAULT PANIC");
+    kprintf("\nPage fault at address=%x | present=%d read-only=%d user-mode=%d reserved=%d instruction-fetch=%d", faulting_address, present, rw, us, reserved, id);
+    kprintf("\nPAGE FAULT PANIC");
     for(;;);
 }
 
@@ -180,9 +174,7 @@ void init_paging(uint32_t available_memory)
     memset(kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
 
-    fb_print("\nPaging Placement address = ");
-    fb_puthex(placement_address);
-    fb_print("\n");
+    kprintf("\nPaging placement address = %x", placement_address);
 
     for (uint32_t i = 0; i < placement_address; i += PAGE_SIZE) {
         alloc_frame(get_page(i, 1, kernel_directory), 0, 0);
