@@ -22,7 +22,7 @@ DOTFILES = boot/boot.o \
 		  kernel/interrupt.o kernel/isr.o kernel/timer.o \
 		  mm/paging.o \
 		  debug/kdebug.o \
-		  libc/string.o libc/stdio.o
+		  libc/ctype.o libc/string.o libc/stdio.o libc/stdlib.o
 
 OBJ = $(patsubst %,$(OBJDIR)%,$(DOTFILES))
 
