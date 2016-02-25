@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <stddef.h>
 #include <descriptor_table.h>
 #include <gdt.h>
 #include <idt.h>

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <stdint.h>
+#include <stddef.h>
 
 // FIXME: remove this when syscalls work
 #include <fb.h>

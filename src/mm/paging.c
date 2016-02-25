@@ -1,5 +1,5 @@
 #include <paging.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 #include <fb.h>
 #include <isr.h>

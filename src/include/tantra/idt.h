@@ -1,7 +1,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
+#include <stddef.h>
 
 // A struct describing an interrupt gate
 struct idt_entry_struct

@@ -1,5 +1,5 @@
-#ifndef STDINT_H
-#define STDINT_H
+#ifndef STDDEF_H
+#define STDDEF_H
 
 typedef unsigned int   uint32_t;
 typedef          int   int32_t;
@@ -10,10 +10,12 @@ typedef          char  int8_t;
 
 typedef unsigned int   size_t;
 
+typedef unsigned char  bool;
+
 #define TRUE    1
 #define FALSE   0
 
-typedef unsigned char  bool;
+#define NULL    ((void *)0)
 
 #define UNUSED(x) (void)(x)
 

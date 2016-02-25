@@ -1,5 +1,5 @@
 #include <fb.h>
-#include <stdint.h>
+#include <stddef.h>
 
 #include <kdebug.h>
 

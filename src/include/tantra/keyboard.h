@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <stdint.h>
+#include <stddef.h>
 #include <isr.h>
 
 void init_keyboard();
